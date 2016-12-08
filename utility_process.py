@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import random
 import string
       
@@ -27,33 +29,59 @@ def postprocess(seq, usernames, numbers, links):
     seq = seq.replace(" ?", "?")
     return seq
     
-def tokenize(lines, unchanged=False):
+def tokenize(lines, unchanged=False, case=False):
     # punctuation etc.
-    punkt = ['.', ';', ',', '(', ')', '[', ']', '!', '?', "'", '`', '´', '"', '#', '$', '&']
+    punkt = ['.', ';', ':', ',', '(', ')', '[', ']', '!', '?', "'", '"', '#', '$', '&', u'´', u'`', '-']
     names = []
     numbers = []
     links = []
-    for i,line in enumerate(lines):
+    for k,line in enumerate(lines):
         # initialization
         result = []
         current_token = ""
         # iterate through line
-        for i in range(0, len(line)):
+        i = 0
+        while i < len(line):
             char = line[i]
-            # skip newline
+            # end on newline
             if char == "\n":
-                continue
-            # handle punctuation
-            elif char in punkt:
-                # handle ampersand
-                if char == ';' & current_token == "amp":
-                    result.append("&")
-                    current_token = ""
-                    continue
                 if current_token != "":
                     result.append(current_token)
-                result.append([char])
-                current_token = ""
+                i += 1
+            # handle punctuation
+            elif char in punkt:
+                # handle ' inside words
+                if (char == "'") and (current_token != "") & (line[i+1] != " "):
+                    current_token += char
+                    i += 1
+                # handle ampersand
+                elif (char == ';') and (current_token == "amp"):
+                    result.append("&")
+                    current_token = ""
+                    i += 1
+                # handle --
+                elif (char == '-') and (line[i+1] == '-'):
+                    if current_token != "":
+                        result.append(current_token)
+                    result.append("--")
+                    current_token = ""
+                    i += 2
+                # handle abbreviations with dots and ...
+                elif (char == '.') and (line[i+1] in (string.ascii_letters + '.')):
+                    j = i
+                    while (j < len(line)) and (line[j] in (string.ascii_letters + '.')):
+                        j += 1
+                    current_token += line[i:j]
+                    result.append(current_token)
+                    current_token = ""
+                    i = j + 1
+                # append token and symbol
+                else:
+                    if current_token != "":
+                        result.append(current_token)
+                    result.append(char)
+                    current_token = ""
+                    i += 1
             # handle whitespace
             elif char == " ":
                 if current_token != "":
@@ -62,28 +90,29 @@ def tokenize(lines, unchanged=False):
                         current_token = "&"
                     result.append(current_token)
                 current_token = ""
+                i += 1
             # handle usernames
             elif char == "@":
                 if current_token != "":
                     result.append(current_token)
                 result.append("@")
                 j = i
-                while line[j] != " ":
+                while (j < len(line)) and (line[j] != " "):
                     j += 1
                 if unchanged:
                     result.append(line[i:j])
                     current_token = ""
                 else:
-                    result.append("<user")
+                    result.append("<user>")
                     current_token = ""
                     names.append(line[i:j])
                 i = j + 1
             # handle links
-            elif line[i:i+4] == "http":
+            elif (i+4 <= len(line)) and (line[i:i+4] == "http"):
                 if current_token != "":
                     result.append(current_token)
                 j = i
-                while line[j] != " ":
+                while (j < len(line)) and (line[j] != " "):
                     j += 1
                 if unchanged:
                     result.append(line[i:j])
@@ -94,9 +123,9 @@ def tokenize(lines, unchanged=False):
                     links.append(line[i:j])
                 i = j + 1
             # handle numbers
-            elif line[i] in string.digits && current_token == "":
+            elif (line[i] in string.digits) and (current_token == ""):
                 j = i
-                while line[j] in (string.digits + ['.',',']):
+                while (j < len(line)) and (line[j] in (string.digits + '.,')):
                     j += 1
                 if unchanged:
                     result.append(line[i:j])
@@ -104,7 +133,14 @@ def tokenize(lines, unchanged=False):
                     result.append("<number>")
                     numbers.append(line[i:j])
                 i = j 
+            # handle normal stuff
+            else:
+                current_token += char
+                i += 1
         # end inner for
-        lines[i] = result
+        # handle case
+        if not case:
+            result = [w.lower() for w in result]
+        lines[k] = result
     # end of outer for
     return (names, numbers, links, lines)

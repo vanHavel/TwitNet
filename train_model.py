@@ -76,8 +76,9 @@ model = load_model(model_file)
 model_basepath = os.path.join(model_dirname, filename)
 
 # get starting loss of model
-current_loss = utility.get_loss(model, X_validate, Y_validate)
-print("Loss before training: %f." % current_loss)
+print ("Evaluating loss.")
+current_loss = utility_model.get_loss(model, X_validate, Y_validate)
+print ("Loss before training: %f." % current_loss)
 
 # training loop
 print ("Training model.")
@@ -104,7 +105,7 @@ for current_epoch in range(1, epochs + 1):
     # calculate loss and adjust learning rate if necessary
     if (current_epoch % evaluate_every) == 0:
         old_loss = current_loss
-        current_loss = utility.get_loss(model, X_validate, Y_validate)
+        current_loss = utility_model.get_loss(model, X_validate, Y_validate)
         print("Loss after epoch %d: %f." % (current_epoch, current_loss))
         if old_loss < current_loss:
             # loss has increased, learning rate is halved

@@ -16,8 +16,8 @@ user_token = "<username>"
 
 # parse command line arguments
 parser = argparse.ArgumentParser(description="Preprocess tweet data.")
-parser.add_argument("-v", "--vocab_size", default=5000, type=int, help="Size of the vocabulary.")
-parser.add_argument("-m", "--min_length", default=4, type=int, help="Minimum word length of a tweet.")
+parser.add_argument("-v", "--vocab_size", default=3000, type=int, help="Size of the vocabulary.")
+parser.add_argument("-m", "--min_length", default=3, type=int, help="Minimum word length of a tweet.")
 parser.add_argument("-c", "--case_sensitive", action="store_true", help="Handle words case-sensitive.")
 parser.add_argument("-u", "--tokens_unchanged", action="store_true", help="Do not replace individual links, usernames etc.")
 parser.add_argument("-i", "--input_file", default="data/tweets.txt")
@@ -27,7 +27,7 @@ input_file = args.input_file
 vocab_size = args.vocab_size
 min_length = args.min_length
 case_sensitive = args.case_sensitive
-links_unchanged = args.links_unchanged
+tokens_unchanged = args.tokens_unchanged
 
 # check arguments
 if vocab_size < 1:
@@ -51,20 +51,11 @@ ifile.close()
 
 # tokenize lines
 print ("Preprocessing input.")
-(usernames, numbers, links, lines) = utility.tokenize(lines, unchanged=tokens_unchanged)
-    
-# map words to lowercase if flag is set
-if not case_sensitive:
-    for i, line in enumerate(lines):
-        lines[i] = [word.lower() for word in line]
-         
-# replace links if flag is set
-if not links_unchanged:
-    for i, line in enumerate(lines):
-        lines[i] = [(link_token if (len(word) > 2 and word[0:2] == "//") else word) for word in line]
+(usernames, numbers, links, lines) = utility_process.tokenize(lines, unchanged=tokens_unchanged, case=case_sensitive)
+print ("Processed %d tweets." % len(lines))
         
 # count word occurrences
-print ("Building vocabulary.")
+print ("Building vocabulary of %d words." % vocab_size)
 vocabdict = dict()
 for line in lines:
     for word in line:
@@ -76,6 +67,7 @@ for line in lines:
 # get most frequent tokens, reserving 3 for start, end and unknown tokens
 sortedvoc = sorted(vocabdict.items(), key=(lambda x: x[1]), reverse=True)
 vocab = sortedvoc[:vocab_size - 3]
+print ("Count of least frequent word: %d" % vocab[-1][1])
 
 # build index to word, word to index tables
 index_to_word = [x[0] for x in vocab] + [tweet_start, tweet_end, unknown_token]
