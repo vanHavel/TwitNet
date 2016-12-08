@@ -4,7 +4,7 @@ import os
 import argparse
 from datetime import *
 
-import utility
+import utility_model
 
 from keras.models import Sequential, load_model
 from keras.utils.np_utils import to_categorical
@@ -55,30 +55,8 @@ data = np.load(training_file)
 X_samples = data['X_samples']
 Y_samples = data['Y_samples']
 
-# initialize lists for training and validation data
-X_train = []
-Y_train = []
-X_validate = []
-Y_validate = []
-
-# for each tweet length reserve some data for validation
-for length_index in range(0, len(X_samples)):
-    # randomly permute the tweets
-    tweets_of_length = len(X_samples[length_index])
-    p = np.random.permutation(tweets_of_length)
-    X_samples[length_index] = X_samples[length_index][p]
-    Y_samples[length_index] = Y_samples[length_index][p]
-    # choose validation split
-    split_index = int(np.floor(validation_split * tweets_of_length))
-    # split into training and validation set (train on all if flag is set)
-    if train_on_all:
-        X_train.append(X_samples[length_index])
-        Y_train.append(Y_samples[length_index])
-    else:
-        X_train.append(X_samples[length_index][:split_index])
-        Y_train.append(Y_samples[length_index][:split_index])
-    X_validate.append(X_samples[length_index][split_index:])
-    Y_validate.append(Y_samples[length_index][split_index:])
+# split into training and validation data
+(X_train, Y_train, X_validate, Y_validate) = utility_model.split_samples(X_samples, Y_samples, validation_split, train_on_all)
 
 # read vocabulary
 print ("Reading vocab.")

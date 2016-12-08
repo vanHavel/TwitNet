@@ -1,21 +1,25 @@
 import numpy as np
 import operator
-import nltk
 import os
 import sys
 import argparse
+import pickle
+
+import utility_process
 
 tweet_start = "<tweet_start>"
 tweet_end = "<tweet_end>"
 unknown_token = "<unknown>"
 link_token = "<link>"
+number_token = "<number>"
+user_token = "<username>"
 
 # parse command line arguments
 parser = argparse.ArgumentParser(description="Preprocess tweet data.")
 parser.add_argument("-v", "--vocab_size", default=5000, type=int, help="Size of the vocabulary.")
 parser.add_argument("-m", "--min_length", default=4, type=int, help="Minimum word length of a tweet.")
 parser.add_argument("-c", "--case_sensitive", action="store_true", help="Handle words case-sensitive.")
-parser.add_argument("-l", "--links_unchanged", action="store_true", help="Do not replace individual links from tweets.")
+parser.add_argument("-u", "--tokens_unchanged", action="store_true", help="Do not replace individual links, usernames etc.")
 parser.add_argument("-i", "--input_file", default="data/tweets.txt")
 args = parser.parse_args()
 
@@ -37,6 +41,7 @@ if min_length < 1:
 (drive, filename) = os.path.split(input_file)
 vocab_file = os.path.join(drive, "vocab.txt")
 training_file = os.path.join(drive, "training_data.npz")
+data_file = os.path.join(drive, "tweet_data.pickle")
 
 # open input file
 print ("Reading input tweets.")
@@ -46,8 +51,7 @@ ifile.close()
 
 # tokenize lines
 print ("Preprocessing input.")
-for i, line in enumerate(lines):
-    lines[i] = nltk.word_tokenize(line[:-1])
+(usernames, numbers, links, lines) = utility.tokenize(lines, unchanged=tokens_unchanged)
     
 # map words to lowercase if flag is set
 if not case_sensitive:
@@ -109,3 +113,6 @@ Y_samples = [np.asarray([[word_to_index[w] for w in tweet[1:]] for tweet in itwe
 #save training data
 print ("Saving training data to %s." % training_file)
 np.savez(training_file, X_samples=X_samples, Y_samples=Y_samples)
+print ("Saving additional tweet data to %s." % data_file)
+dfile = open(data_file, "wb")
+pickle.dump((usernames, numbers, links), dfile)
