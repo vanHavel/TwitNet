@@ -5,14 +5,17 @@ import argparse
 
 import utility.process
 
+# constants
+newline = "<newline>"
+
 # parse command line arguments
 parser = argparse.ArgumentParser(description="Preprocess tweet data for character based language model.")
 parser.add_argument("-i", "--input_file", default="data/tweets.txt", help="Path to tweet input file.")
-parser.add_argument("-h", "--history", default=40, type=int, help="Maximum length of char history used for backpropagation through time steps.")
+parser.add_argument("-l", "--history_length", default=40, type=int, help="Maximum length of char history used for backpropagation through time steps.")
 args = parser.parse_args()
 
 input_file = args.input_file
-history = args.history
+history = args.history_length
 
 # check arguments
 if history < 2:
@@ -38,8 +41,8 @@ for line in lines:
         if char not in vocab:
             vocab.append(char)
 
-# build index to char, char to index tables
-index_to_char = vocab
+# build index to char, char to index tables, handling newline character
+index_to_char = [(c if c != "\n" else newline) for c in vocab]
 char_to_index = dict([(c,i) for i,c in enumerate(index_to_char)])
 
 # write vocab to file
@@ -53,17 +56,17 @@ ofile.close()
 print ("Creating training data.")
 # concat all lines
 corpus = ""
-for line in line:
+for line in lines:
     corpus += line
     
-# map to indices
-corpus = [char_to_index[c] for c in corpus]
+# map to indices, handling newline character
+corpus = [(char_to_index[c] if c != "\n" else char_to_index[newline]) for c in corpus]
 
 # split into samples of length history
-num_samples = np.floor(len(corpus / history))
-samples = [corpus[i:i+history] for i in range(0, num_samples)]
-X_samples = [sample[:-1] for sample in samples]
-Y_samples = [sample[1:] for sample in samples]
+num_samples = int(np.floor(len(corpus) / history))
+samples = [corpus[i * history : i * history + history] for i in range(0, num_samples)]
+X_samples = np.array([sample[:-1] for sample in samples])
+Y_samples = np.array([sample[1:] for sample in samples])
 
 # randomly permute the samples
 p = np.random.permutation(len(X_samples))

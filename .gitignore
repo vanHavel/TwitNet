@@ -1,4 +1,5 @@
 __pycache__/*
+utility/__pycache__/*
 .DS_Store
 data/*
 model/*

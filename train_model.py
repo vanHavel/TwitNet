@@ -7,8 +7,6 @@ from datetime import *
 import utility.model
 
 from keras.models import Sequential, load_model
-from keras.utils.np_utils import to_categorical
-from keras.layers import Embedding
 
 # parse command line arguments
 parser = argparse.ArgumentParser(description="Train an RNN model.")
@@ -50,14 +48,9 @@ if validation_split <= 0.0 or validation_split >= 1.0:
     print("Invalid validation split, must be in (0,1).")
     sys.exit(1)
 
-# read training data
-print("Reading training data.")
-data = np.load(training_file)
-X_samples = data['X_samples']
-Y_samples = data['Y_samples']
-
-# split into training and validation data
-(X_train, Y_train, X_validate, Y_validate) = utility.model.split_samples(X_samples, Y_samples, validation_split, train_on_all)
+# load the model            
+print ("Loading model.")
+model = load_model(model_file)
 
 # read vocabulary
 print ("Reading vocab.")
@@ -67,9 +60,15 @@ vocab_size = len(index_to_word)
 word_to_index = dict([(c,i) for i,c in enumerate(index_to_word)])
 vfile.close()
 
-# load the model            
-print ("Loading model.")
-model = load_model(model_file)
+# read training data
+print ("Reading training data.")
+data = np.load(training_file)
+X_samples = data['X_samples']
+Y_samples = data['Y_samples']
+
+print ("Spliting into training and validation data.")
+# split into training and validation data
+(X_train, Y_train, X_validate, Y_validate) = utility.model.split_samples(model, X_samples, Y_samples, validation_split, vocab_size, train_on_all)
 
 # generate output path for saved models
 (model_dirname, model_basename) = os.path.split(model_file)
@@ -78,7 +77,7 @@ model_basepath = os.path.join(model_dirname, filename)
 
 # get starting loss of model
 print ("Evaluating loss.")
-current_loss = utility.model.get_loss(model, X_validate, Y_validate)
+current_loss = utility.model.get_loss(model, X_validate, Y_validate, vocab_size)
 print ("Loss before training: %f." % current_loss)
 
 # training loop
@@ -98,18 +97,13 @@ for current_epoch in range(1, epochs + 1):
             p = np.random.permutation(len(X_batch))
             X_batch = X_batch[p]
             Y_batch = Y_batch[p]
-            # expand dimension to use keras sparse_categorical_crossentropy
-            Y_batch = np.expand_dims(Y_batch, -1)
-            # if there is no embeddding layer: transform X_batch to one-hot-encoding
-            if not (type(model.layers[0]) is Embedding):
-                X_batch = to_categorical(X_batch, vocab_size)
             # train network for 1 epoch on the batch
             model.fit(X_batch, Y_batch, batch_size=batchsize, nb_epoch=1, verbose=0)
     
     # calculate loss and adjust learning rate if necessary
     if (current_epoch % evaluate_every) == 0:
         old_loss = current_loss
-        current_loss = utility.model.get_loss(model, X_validate, Y_validate)
+        current_loss = utility.model.get_loss(model, X_validate, Y_validate, vocab_size)
         print("Loss after epoch %d: %f." % (current_epoch, current_loss))
         if old_loss < current_loss:
             # loss has increased, learning rate is halved

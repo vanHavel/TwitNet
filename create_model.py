@@ -60,9 +60,9 @@ else:
     if layer_type == "rnn":
         model.add(SimpleRNN(output_dim=hidden_size, return_sequences=True, input_shape=(None, vocab_size)))
     elif layer_type == "lstm":
-        model.add(LSTM(output_dim=hidden_size, return_sequences=True), input_shape=(None, vocab_size))
+        model.add(LSTM(output_dim=hidden_size, return_sequences=True, input_shape=(None, vocab_size)))
     elif layer_type == "gru":
-        model.add(GRU(output_dim=hidden_size, return_sequences=True), input_shape=(None, vocab_size))
+        model.add(GRU(output_dim=hidden_size, return_sequences=True, input_shape=(None, vocab_size)))
     # maybe add dropout
     if (dropout > 0.0):
         model.add(Dropout(dropout))
