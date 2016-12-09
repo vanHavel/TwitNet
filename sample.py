@@ -21,6 +21,7 @@ parser.add_argument("-d", "--data_file", default="data/tweet_data.pickle", help=
 parser.add_argument("-n", "--samples_number", default=3, type=int, help="Number of samples to create for each user input.")
 parser.add_argument("-l", "--max_length", default=32, type=int, help="Maximum number of words in a tweet.")
 parser.add_argument("-t", "--temperature", default=1.0, type=float, help="Temperature for sampling from the network's output distribution.")
+parser.add_argument("-u", "--sample_unknown", action="store_true", help="Allow sampling the <unknown> token in tweets.")
 args = parser.parse_args()
 
 model_file = args.model_file
@@ -29,6 +30,7 @@ data_file = args.data_file
 samples_number = args.samples_number
 max_length = args.max_length
 temperature = args.temperature
+sample_unknown = args.sample_unknown
 
 # check command line arguments
 if temperature < 0.0:
@@ -72,7 +74,8 @@ while user_input != ":q":
         seq = [tweet_start]
     seq_indexed = [(word_to_index[w] if w in word_to_index else word_to_index[unknown_token]) for w in seq]
     for i in range(0, samples_number):
-        generated = utility.model.generate_tweet(model, seq_indexed, max_length, temperature, word_to_index[tweet_end])
+        generated = utility.model.generate_tweet(model, seq_indexed, word_to_index[tweet_end], 
+                                                 max_length=max_length, temperature=temperature, sample_unknown=sample_unknown)
         generated_words = [index_to_word[i] for i in generated]
         generated_words = utility.process.postprocess(generated_words, usernames, numbers, links)
         print(generated_words)

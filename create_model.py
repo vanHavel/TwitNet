@@ -51,10 +51,24 @@ vfile.close()
 # build the keras model
 print("Building model.")
 model = Sequential()
-# embedding layer
-model.add(Embedding(vocab_size, hidden_size))
+# embedding layer, only add if vocab_size is significantly larger than hidden size
+if vocab_size > (hidden_size * 5):
+    model.add(Embedding(vocab_size, hidden_size))
+    layer_start = 0
+else:
+    # start directly with the first layer, and specify input shape
+    if layer_type == "rnn":
+        model.add(SimpleRNN(output_dim=hidden_size, return_sequences=True, input_shape=(None, vocab_size)))
+    elif layer_type == "lstm":
+        model.add(LSTM(output_dim=hidden_size, return_sequences=True), input_shape=(None, vocab_size))
+    elif layer_type == "gru":
+        model.add(GRU(output_dim=hidden_size, return_sequences=True), input_shape=(None, vocab_size))
+    # maybe add dropout
+    if (dropout > 0.0):
+        model.add(Dropout(dropout))
+    layer_start = 1
 # recurrent layers
-for i in range(0, hidden_num):
+for i in range(layer_start, hidden_num):
     if layer_type == "rnn":
         model.add(SimpleRNN(output_dim=hidden_size, return_sequences=True))
     elif layer_type == "lstm":
@@ -65,6 +79,7 @@ for i in range(0, hidden_num):
     if (dropout > 0.0):
         model.add(Dropout(dropout))
 
+# end with softmax operation
 model.add(TimeDistributed(Dense(output_dim=vocab_size)))
 model.add(Activation("softmax"))
 

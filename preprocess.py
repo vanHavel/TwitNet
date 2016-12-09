@@ -1,5 +1,4 @@
 import numpy as np
-import operator
 import os
 import sys
 import argparse
@@ -15,12 +14,12 @@ number_token = "<number>"
 user_token = "<username>"
 
 # parse command line arguments
-parser = argparse.ArgumentParser(description="Preprocess tweet data.")
-parser.add_argument("-v", "--vocab_size", default=3000, type=int, help="Size of the vocabulary.")
+parser = argparse.ArgumentParser(description="Preprocess tweet data for word based language model.")
+parser.add_argument("-i", "--input_file", default="data/tweets.txt", help="Path to tweet input file.")
+parser.add_argument("-v", "--vocab_size", default=4000, type=int, help="Size of the vocabulary.")
 parser.add_argument("-m", "--min_length", default=3, type=int, help="Minimum word length of a tweet.")
 parser.add_argument("-c", "--case_sensitive", action="store_true", help="Handle words case-sensitive.")
 parser.add_argument("-u", "--tokens_unchanged", action="store_true", help="Do not replace individual links, usernames etc.")
-parser.add_argument("-i", "--input_file", default="data/tweets.txt")
 args = parser.parse_args()
 
 input_file = args.input_file

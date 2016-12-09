@@ -8,6 +8,7 @@ import utility.model
 
 from keras.models import Sequential, load_model
 from keras.utils.np_utils import to_categorical
+from keras.layers import Embedding
 
 # parse command line arguments
 parser = argparse.ArgumentParser(description="Train an RNN model.")
@@ -99,6 +100,9 @@ for current_epoch in range(1, epochs + 1):
             Y_batch = Y_batch[p]
             # expand dimension to use keras sparse_categorical_crossentropy
             Y_batch = np.expand_dims(Y_batch, -1)
+            # if there is no embeddding layer: transform X_batch to one-hot-encoding
+            if not (type(model.layers[0]) is Embedding):
+                X_batch = to_categorical(X_batch, vocab_size)
             # train network for 1 epoch on the batch
             model.fit(X_batch, Y_batch, batch_size=batchsize, nb_epoch=1, verbose=0)
     

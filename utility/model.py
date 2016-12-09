@@ -1,15 +1,24 @@
 import copy
 import numpy as np
 
+# sample a new word from a given sequence
+def sample(model, seq, temperature):
+    preds = model.predict(np.array([seq]))[-1][-1] * .999
+    preds = np.log(preds) / temperature
+    preds = np.exp(preds) / np.sum(np.exp(preds))
+    choice = np.random.multinomial(1, preds)
+    return np.argmax(choice)
+
 # generate a tweet prediction from the model
-def generate_tweet(model, start, max_length, temperature, end_index):
+def generate_tweet(model, start, end_index, unknown_index, max_length=30, temperature=1.0, sample_unknown=False):
     seq = copy.copy(start)
     while (len(seq) < max_length) & (seq[-1] != end_index):
-        preds = model.predict(np.array([seq]))[-1][-1] * .999
-        preds = np.log(preds) / temperature
-        preds = np.exp(preds) / np.sum(np.exp(preds))
-        choice = np.random.multinomial(1, preds)
-        nextword = np.argmax(choice)
+        nextword = unknown_index
+        if sample_unknown:
+            nextword = sample(model, seq, temperature)
+        else:
+            while (nextword == unknown_index):
+                nextword = sample(model, seq, temperature)
         seq.append(nextword)
     if seq[-1] != end_index:
         seq.append(end_index)
