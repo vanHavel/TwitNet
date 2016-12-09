@@ -4,26 +4,35 @@ import numpy as np
 from keras.layers import Embedding
 from keras.utils.np_utils import to_categorical
 
+def softmax(preds):
+    log_softmax = preds - np.log(np.sum(np.exp(preds)))
+    return np.exp(log_softmax)
+
 # sample a new word from a given sequence
-def sample(model, seq, temperature):
+def sample(model, seq, temperature, vocab_size):
     if not (type(model.layers[0]) is Embedding):
         # transform to one-hot encoding
-        net_input = to_categorical([seq], vocab_size)
+        net_input = [to_categorical(seq, vocab_size)]
     else:
         net_input = [seq]
-    preds = model.predict(np.array(net_input))[-1][-1] * .999
+    # predict from model
+    preds = model.predict(np.array(net_input))[-1][-1]
+    # rescale with temperature
     preds = np.log(preds) / temperature
-    preds = np.exp(preds) / np.sum(np.exp(preds))
+    preds = softmax(preds)
+    # multiply with .99 to be save below 1
+    preds *= .99
+    # sample from distribution
     choice = np.random.multinomial(1, preds)
     return np.argmax(choice)
 
 # generate a tweet prediction from the model
-def generate_tweet(model, start, end_index, unknown_index=0, max_length=30, temperature=1.0, sample_unknown=False):
+def generate_tweet(model, start, end_index, vocab_size, unknown_index=0, max_length=30, temperature=1.0, sample_unknown=False):
     seq = copy.copy(start)
     while (len(seq) < max_length) & (seq[-1] != end_index):
         nextword = unknown_index
         if sample_unknown:
-            nextword = sample(model, seq, temperature)
+            nextword = sample(model, seq, temperature, vocab_size)
         else:
             while (nextword == unknown_index):
                 nextword = sample(model, seq, temperature)

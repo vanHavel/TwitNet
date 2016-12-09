@@ -74,7 +74,7 @@ while user_input != ":q":
         seq = [tweet_start]
     seq_indexed = [(word_to_index[w] if w in word_to_index else word_to_index[unknown_token]) for w in seq]
     for i in range(0, samples_number):
-        generated = utility.model.generate_tweet(model, seq_indexed, word_to_index[tweet_end], unknown_index=word_to_index[unknown_token], 
+        generated = utility.model.generate_tweet(model, seq_indexed, word_to_index[tweet_end], vocab_size, unknown_index=word_to_index[unknown_token], 
                                                  max_length=max_length, temperature=temperature, sample_unknown=sample_unknown)
         generated_words = [index_to_word[i] for i in generated]
         generated_words = utility.process.postprocess(generated_words, usernames, numbers, links)

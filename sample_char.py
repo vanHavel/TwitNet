@@ -40,7 +40,7 @@ if max_length < 1:
 print ("Reading vocab.")
 vfile = open(vocab_file, "r")
 index_to_char = [line[:-1] for line in vfile.readlines()]
-vocabsize = len(index_to_char)
+vocab_size = len(index_to_char)
 char_to_index = dict([(c,i) for i,c in enumerate(index_to_char)])
 vfile.close()
 
@@ -64,9 +64,11 @@ while user_input != ":q":
     seq_filtered = filter(lambda c: c in char_to_index, seq)
     seq_indexed = [char_to_index[c] for c in list(seq_filtered)]
     for i in range(0, samples_number):
-        generated = utility.model.generate_tweet(model, seq_indexed, char_to_index[newline], 
+        generated = utility.model.generate_tweet(model, seq_indexed, char_to_index[newline], vocab_size,
                                                  max_length=max_length, temperature=temperature, sample_unknown=True)
         generated_chars = [index_to_char[i] for i in generated]
-        print(str(generated_chars))
+        output = "".join(generated_chars)
+        output = output.replace(newline, "\n")
+        print(output)
     user_input = input()
         
