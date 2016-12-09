@@ -2,8 +2,8 @@ import argparse
 import sys
 import pickle
 
-import utility_process
-import utility_model
+import utility.process
+import utility.model
 
 from keras.models import load_model
 
@@ -67,14 +67,14 @@ user_input = input()
 while user_input != ":q":
     if user_input != "":
         # tokenize the user input
-        seq = [tweet_start] + (utility_process.tokenize([user_input + "\n"]))[3][0]
+        seq = [tweet_start] + (utility.process.tokenize([user_input + "\n"]))[3][0]
     else:
         seq = [tweet_start]
     seq_indexed = [(word_to_index[w] if w in word_to_index else word_to_index[unknown_token]) for w in seq]
     for i in range(0, samples_number):
-        generated = utility_model.generate_tweet(model, seq_indexed, max_length, temperature, word_to_index[tweet_end])
+        generated = utility.model.generate_tweet(model, seq_indexed, max_length, temperature, word_to_index[tweet_end])
         generated_words = [index_to_word[i] for i in generated]
-        generated_words = utility_process.postprocess(generated_words, usernames, numbers, links)
+        generated_words = utility.process.postprocess(generated_words, usernames, numbers, links)
         print(generated_words)
     user_input = input()
         

@@ -5,7 +5,7 @@ import sys
 import argparse
 import pickle
 
-import utility_process
+import utility.process
 
 tweet_start = "<tweet_start>"
 tweet_end = "<tweet_end>"
@@ -51,7 +51,7 @@ ifile.close()
 
 # tokenize lines
 print ("Preprocessing input.")
-(usernames, numbers, links, lines) = utility_process.tokenize(lines, unchanged=tokens_unchanged, case=case_sensitive)
+(usernames, numbers, links, lines) = utility.process.tokenize(lines, unchanged=tokens_unchanged, case=case_sensitive)
 print ("Processed %d tweets." % len(lines))
         
 # count word occurrences
@@ -101,6 +101,12 @@ tweets = [list(filter (lambda x: len(x) == i, tweets)) for i in range(min_length
 # map words to indices and store training sequences in list of numpy arrays. There is one array for each tweet length.
 X_samples = [np.asarray([[word_to_index[w] for w in tweet[:-1]] for tweet in itweets]) for itweets in tweets]
 Y_samples = [np.asarray([[word_to_index[w] for w in tweet[1:]] for tweet in itweets]) for itweets in tweets]
+
+# randomly permute the samples
+for length_index in range(0, len(X_samples)):
+    p = np.random.permutation(len(X_samples[length_index]))
+    X_samples[length_index] = X_samples[length_index][p]
+    Y_samples[length_index] = Y_samples[length_index][p]   
 
 #save training data
 print ("Saving training data to %s." % training_file)

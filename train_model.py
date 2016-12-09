@@ -4,7 +4,7 @@ import os
 import argparse
 from datetime import *
 
-import utility_model
+import utility.model
 
 from keras.models import Sequential, load_model
 from keras.utils.np_utils import to_categorical
@@ -56,7 +56,7 @@ X_samples = data['X_samples']
 Y_samples = data['Y_samples']
 
 # split into training and validation data
-(X_train, Y_train, X_validate, Y_validate) = utility_model.split_samples(X_samples, Y_samples, validation_split, train_on_all)
+(X_train, Y_train, X_validate, Y_validate) = utility.model.split_samples(X_samples, Y_samples, validation_split, train_on_all)
 
 # read vocabulary
 print ("Reading vocab.")
@@ -77,7 +77,7 @@ model_basepath = os.path.join(model_dirname, filename)
 
 # get starting loss of model
 print ("Evaluating loss.")
-current_loss = utility_model.get_loss(model, X_validate, Y_validate)
+current_loss = utility.model.get_loss(model, X_validate, Y_validate)
 print ("Loss before training: %f." % current_loss)
 
 # training loop
@@ -105,7 +105,7 @@ for current_epoch in range(1, epochs + 1):
     # calculate loss and adjust learning rate if necessary
     if (current_epoch % evaluate_every) == 0:
         old_loss = current_loss
-        current_loss = utility_model.get_loss(model, X_validate, Y_validate)
+        current_loss = utility.model.get_loss(model, X_validate, Y_validate)
         print("Loss after epoch %d: %f." % (current_epoch, current_loss))
         if old_loss < current_loss:
             # loss has increased, learning rate is halved
