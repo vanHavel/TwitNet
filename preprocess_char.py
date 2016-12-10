@@ -19,7 +19,7 @@ history = args.history_length
 
 # check arguments
 if history < 2:
-    print ("Invalid histroy value, must be greater than 1.")
+    print ("Invalid history value, must be greater than 1.")
     sys.exit(1)
 
 # create paths to output files
