@@ -62,11 +62,17 @@ for line in lines:
 # map to indices, handling newline character
 corpus = [(char_to_index[c] if c != "\n" else char_to_index[newline]) for c in corpus]
 
+# for efficiency: use bytes to store small numbers
+if len(index_to_char) < 256:
+    int_size = np.uint8
+else:
+    int_size = np.uint32
+
 # split into samples of length history
 num_samples = int(np.floor(len(corpus) / history))
 samples = [corpus[i * history : i * history + history] for i in range(0, num_samples)]
-X_samples = np.array([sample[:-1] for sample in samples])
-Y_samples = np.array([sample[1:] for sample in samples])
+X_samples = np.array([sample[:-1] for sample in samples], dtype=int_size)
+Y_samples = np.array([sample[1:] for sample in samples], dtype=int_size)
 
 # randomly permute the samples
 p = np.random.permutation(len(X_samples))

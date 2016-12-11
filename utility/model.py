@@ -44,7 +44,7 @@ def generate_tweet(model, start, end_index, vocab_size, unknown_index=0, max_len
 
 # transfrom batch to one hot encoding    
 def to_one_hot(X_batch, vocab_size):
-    new_batch = np.zeros((len(X_batch), len(X_batch[0]), vocab_size))
+    new_batch = np.zeros((len(X_batch), len(X_batch[0]), vocab_size), dtype=np.uint8)
     for i in range(0, len(X_batch)):
         new_batch[i] = to_categorical(X_batch[i], vocab_size)
     return new_batch
