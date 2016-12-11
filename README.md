@@ -37,13 +37,13 @@ TwitNet was mainly developed with word based language models in mind, where the 
 
 ## Detailed description of scripts
 ### preprocess.py
-Preproccesses a file of tweets, given in a text file in the format of one tweet per line. This splits up the tweets into words and (if not turned of by the flag) performs some more preprocessing steps: 
+Preproccesses a file of tweets, given in a text file in the format of one tweet per line. This splits up the tweets into words and (if not turned off by the flag) performs some more preprocessing steps: 
 
-* Every link is replaced by the \<link\> token, every number by the \<number\> token, and every twitter username by the <\user\> token. Hashtags are not replaced. 
+* Every link is replaced by the \<link\> token, every number by the \<number\> token, and every twitter username by the \<user\> token. Hashtags are not replaced. 
 
  The idea behind this is that hashtags might add some significant meaning to the tweets, while concrete links, numbers or usernames are less important. This is of course debatable, and this preprocessing step can be turned off - in this case it might be necessary to also increase the vocabulary size.
  
- The replaced links, names and numbers are stored in an data additional tweet data file in the same directory as the input tweet file. Tokens appearing multiple times will also be stored with their multiplicity. During sampling, the tokens are replaced by samples chosen uniformly at random from this stored data.
+ The replaced links, names and numbers are stored in an additional tweet data file in the same directory as the input tweet file. Tokens appearing multiple times will also be stored with their multiplicity. During sampling, the tokens are replaced by samples chosen uniformly at random from this stored data.
 * The vocabulary is limited to the most frequent words, where the vocabulary size is given as command line argument (default: 4000). Every word not in the vocabulary is replaced by the \<unknown\> token.
 * Words are mapped to indices and the tweets are stored as training sequences for the language model. The training data is stored in the same directory as the tweet input data.
 
@@ -67,13 +67,13 @@ As optimizer either Adam or RMSProp can be chosen and the initial learning rate 
 #### Command Line Arguments
 TODO
 ### train_model.py
-Trains a given model for a specified number of epochs. For this, the training data is split into training and validation data, and the loss is evaluated regularily on the validation data. The model parameters are also saved regularily. If desired, the model can be trained on the complete training data, with the potential danger of overfitting - the loss will then be evaluated on a part of the training data. The learning rate is adjusted automatically once the loss stops decreasing.
+Trains a given model for a specified number of epochs. For this, the training data is split into training and validation data, and the loss is evaluated regularly on the validation data. The model parameters are also saved regularly. If desired, the model can be trained on the complete training data, with the potential danger of overfitting - the loss will then be evaluated on a part of the training data. The learning rate is adjusted automatically once the loss stops decreasing.
 #### Command Line Arguments
 TODO
 ### sample.py
 Samples tweets from a trained word based language model. For this purpose the user can supply an initial sequence to the model which is then completed into a number of tweets of specified maximum length. 
 
-If special tokens for links etc. where created during preprocessing, they are replaced with values sampled uniformly at random from the stored tweet data. Unless specified by the corresponding flag, no \<unknown\> tokens will be samples. One can also experiment with a temperature argument for sampling, where a temperature < 1 will lead to a less random output. Note that it will initially take several seconds to load the model parameters.
+If special tokens for links etc. where created during preprocessing, they are replaced with values sampled uniformly at random from the stored tweet data. Unless specified by the corresponding flag, no \<unknown\> tokens will be sampled. One can also experiment with a temperature argument for sampling, where a temperature < 1 will lead to a less random output. Note that it will initially take several seconds to load the model parameters.
 #### Command Line Arguments
 TODO
 ### sample_char.py
