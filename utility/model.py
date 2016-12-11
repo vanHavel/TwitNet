@@ -20,8 +20,9 @@ def sample(model, seq, temperature, vocab_size):
     # rescale with temperature
     preds = np.log(preds) / temperature
     preds = softmax(preds)
-    # multiply with .99 to be save below 1
-    preds *= .99
+    # multiply with 1 - eps)9 to be save below 1
+    while sum(preds) > 1.0:
+        preds *= 0.9999
     # sample from distribution
     choice = np.random.multinomial(1, preds)
     return np.argmax(choice)
