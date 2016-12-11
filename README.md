@@ -36,4 +36,47 @@ TwitNet was mainly developed with word based language models in mind, where the 
 6. Clone this repository. You should now be able to run the scripts.
 
 ## Detailed description of scripts
+### preprocess.py
+Preproccesses a file of tweets, given in a text file in the format of one tweet per line. This splits up the tweets into words and (if not turned of by the flag) performs some more preprocessing steps: 
+
+* Every link is replaced by the \<link\> token, every number by the \<number\> token, and every twitter username by the <\user\> token. Hashtags are not replaced. 
+
+ The idea behind this is that hashtags might add some significant meaning to the tweets, while concrete links, numbers or usernames are less important. This is of course debatable, and this preprocessing step can be turned off - in this case it might be necessary to also increase the vocabulary size.
+ 
+ The replaced links, names and numbers are stored in an data additional tweet data file in the same directory as the input tweet file. Tokens appearing multiple times will also be stored with their multiplicity. During sampling, the tokens are replaced by samples chosen uniformly at random from this stored data.
+* The vocabulary is limited to the most frequent words, where the vocabulary size is given as command line argument (default: 4000). Every word not in the vocabulary is replaced by the \<unknown\> token.
+* Words are mapped to indices and the tweets are stored as training sequences for the language model. The training data is stored in the same directory as the tweet input data.
+
+#### Command Line Arguments
+TODO
+### preprocess_char.py
+Preprocesses a file of tweets in the same input format as for `preprocess.py`, but training data is created for training a character based language model. For this, the whole tweet corpus is simply concatenated and split into fixed length character sequences. No replacement of links etc. is performed and the vocabulary is not limited, since it will typically be small(\< 100). 
+
+An important parameter is the history length, which determines the length of training sequences and thus the maximum number of backpropagation through time steps. The default history length is 40 characters.
+#### Command Line Arguments
+TODO
+### create_model.py
+Creates a keras recurrent neural network model with the parameters given on the command line. The structure of the network is
+
+* One initial embedding layer from the vocabulary size to the hidden size. This layer is omitted if the vocabulary size is not at least five times as large as the hidden size, which typically happens in character based models.
+* A specified number of recurrent layers(default: 2) with a specified number of hidden units per layer(default: 128). The default architecture is LSTM, but RNNs and GRUs are also available.
+* Optinally dropout is performed after each recurrent layer with given retention probability.
+* A final dense layer from the hidden size to the vocabulary size.
+
+As optimizer either Adam or RMSProp can be chosen and the initial learning rate can be specified. The model is compiled and stored at the specified output location.
+#### Command Line Arguments
+TODO
+### train_model.py
+Trains a given model for a specified number of epochs. For this, the training data is split into training and validation data, and the loss is evaluated regularily on the validation data. The model parameters are also saved regularily. If desired, the model can be trained on the complete training data, with the potential danger of overfitting - the loss will then be evaluated on a part of the training data. The learning rate is adjusted automatically once the loss stops decreasing.
+#### Command Line Arguments
+TODO
+### sample.py
+Samples tweets from a trained word based language model. For this purpose the user can supply an initial sequence to the model which is then completed into a number of tweets of specified maximum length. 
+
+If special tokens for links etc. where created during preprocessing, they are replaced with values sampled uniformly at random from the stored tweet data. Unless specified by the corresponding flag, no \<unknown\> tokens will be samples. One can also experiment with a temperature argument for sampling, where a temperature < 1 will lead to a less random output. Note that it will initially take several seconds to load the model parameters.
+#### Command Line Arguments
+TODO
+### sample_char.py
+Like `sample.char`, except that tweets are sampled from a character based language model. 
+#### Command Line Arguments
 TODO
