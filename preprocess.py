@@ -18,8 +18,8 @@ parser = argparse.ArgumentParser(description="Preprocess tweet data for word bas
 parser.add_argument("-i", "--input_file", default="data/tweets.txt", help="Path to tweet input file.")
 parser.add_argument("-v", "--vocab_size", default=4000, type=int, help="Size of the vocabulary.")
 parser.add_argument("-m", "--min_length", default=3, type=int, help="Minimum word length of a tweet.")
-parser.add_argument("-c", "--case_sensitive", action="store_true", help="Handle words case-sensitive.")
-parser.add_argument("-u", "--tokens_unchanged", action="store_true", help="Do not replace individual links, usernames etc.")
+parser.add_argument("-c", "--case_sensitive", action="store_true", help="If set, handle words case-sensitive.")
+parser.add_argument("-u", "--tokens_unchanged", action="store_true", help="If set, do not replace individual links, usernames and numbers.")
 args = parser.parse_args()
 
 input_file = args.input_file

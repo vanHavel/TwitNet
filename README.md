@@ -45,10 +45,18 @@ Preproccesses a file of tweets, given in a text file in the format of one tweet 
  
  The replaced links, names and numbers are stored in an additional tweet data file in the same directory as the input tweet file. Tokens appearing multiple times will also be stored with their multiplicity. During sampling, the tokens are replaced by samples chosen uniformly at random from this stored data.
 * The vocabulary is limited to the most frequent words, where the vocabulary size is given as command line argument (default: 4000). Every word not in the vocabulary is replaced by the \<unknown\> token.
+* Very short tweets with less than the given minimum length are removed.
 * Words are mapped to indices and the tweets are stored as training sequences for the language model. The training data is stored in the same directory as the tweet input data.
 
 #### Command Line Arguments
-TODO
+| Short name | Long name | Argument type | Default value | Description |
+|---|---|---|---|---|
+| `-i` | `--input_file` | String | "data/tweets.txt" | Path to tweet input file. |
+| `-v` | `--vocab_size` | Integer | 4000 | Size of the vocabulary. |
+| `-m` | `--min_length` | Integer | 3 |  Minimum word length of a tweet. |
+| `-c` | `--case_sensitive` | Flag | False | If set, handle words case-sensitive. |
+| `-u` | `--tokens_unchanged` | Flag | False | If set, do not replace individual links, usernames and numbers. |
+| `-h` | `--help` | Flag | False | Print help text. |
 ### preprocess_char.py
 Preprocesses a file of tweets in the same input format as for `preprocess.py`, but training data is created for training a character based language model. For this, the whole tweet corpus is simply concatenated and split into fixed length character sequences. No replacement of links etc. is performed and the vocabulary is not limited, since it will typically be small(\< 100). 
 
