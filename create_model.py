@@ -17,7 +17,7 @@ parser.add_argument("-n", "--hidden_num", default=2, type=int, help="Number of h
 parser.add_argument("-s", "--hidden_size", default=128, type=int, help="Number of neurons per hidden layer.")
 parser.add_argument("-a", "--optimizer", default="adam", choices=["adam","rmsprop"], help="Optimizer to use.")
 parser.add_argument("-l", "--learning_rate", default=0.001, type=float, help="Initial learning rate for the optimizer.")
-parser.add_argument("-d", "--dropout", default=0.0, type=float, help="If set to 0 < p < 1: apply dropout with p after each recurrent layer.")
+parser.add_argument("-d", "--dropout", default=0.0, type=float, help="If set to 0 < p < 1: apply dropout with retention probability p after each recurrent layer.")
 args = parser.parse_args()
 
 output_file = args.output_file

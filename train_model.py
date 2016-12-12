@@ -18,7 +18,7 @@ parser.add_argument("-b", "--batchsize", default=32, type=int, help="Minibatch s
 parser.add_argument("-s", "--save_every", default=1, type=int, help="Save model paramters after every n epochs.")
 parser.add_argument("-l", "--evaluate_every", default=1, type=int, help="Evaluate loss after every n epochs.")
 parser.add_argument("-p", "--validation_split", default=0.1, type=float, help="Part of training data used as validation data for evaluating loss.")
-parser.add_argument("-a", "--train_on_all", action="store_true", help="Train on all examples, including the validation samples. Might lead to overfitting.")
+parser.add_argument("-a", "--train_on_all", action="store_true", help="If set, train on all examples, including the validation samples. Might lead to overfitting.")
 args = parser.parse_args()
 
 model_file = args.model_file

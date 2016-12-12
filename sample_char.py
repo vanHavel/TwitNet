@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser(description="Sample tweets from a model.")
 parser.add_argument("-m", "--model_file", default="model/model.mod", help="Path to model file.")
 parser.add_argument("-v", "--vocab_file", default="data/vocab.txt", help="Path to vocabulary file.")
 parser.add_argument("-n", "--samples_number", default=3, type=int, help="Number of samples to create for each user input.")
-parser.add_argument("-l", "--max_length", default=140, type=int, help="Maximum number of characters in a tweet.")
+parser.add_argument("-l", "--max_length", default=140, type=int, help="Maximum number of characters in a sampled tweet.")
 parser.add_argument("-t", "--temperature", default=1.0, type=float, help="Temperature for sampling from the network's output distribution.")
 args = parser.parse_args()
 

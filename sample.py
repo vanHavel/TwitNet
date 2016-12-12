@@ -19,9 +19,9 @@ parser.add_argument("-m", "--model_file", default="model/model.mod", help="Path 
 parser.add_argument("-v", "--vocab_file", default="data/vocab.txt", help="Path to vocabulary file.")
 parser.add_argument("-d", "--data_file", default="data/tweet_data.pickle", help="Path to tweet data file.")
 parser.add_argument("-n", "--samples_number", default=3, type=int, help="Number of samples to create for each user input.")
-parser.add_argument("-l", "--max_length", default=32, type=int, help="Maximum number of words in a tweet.")
+parser.add_argument("-l", "--max_length", default=32, type=int, help="Maximum number of words in a sampled tweet.")
 parser.add_argument("-t", "--temperature", default=1.0, type=float, help="Temperature for sampling from the network's output distribution.")
-parser.add_argument("-u", "--sample_unknown", action="store_true", help="Allow sampling the <unknown> token in tweets.")
+parser.add_argument("-u", "--sample_unknown", action="store_true", help="If set, allow sampling the <unknown> token in tweets.")
 args = parser.parse_args()
 
 model_file = args.model_file
