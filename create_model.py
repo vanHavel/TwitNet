@@ -18,6 +18,7 @@ parser.add_argument("-s", "--hidden_size", default=128, type=int, help="Number o
 parser.add_argument("-a", "--optimizer", default="adam", choices=["adam","rmsprop"], help="Optimizer to use.")
 parser.add_argument("-l", "--learning_rate", default=0.001, type=float, help="Initial learning rate for the optimizer.")
 parser.add_argument("-d", "--dropout", default=0.0, type=float, help="If set to 0 < p < 1: apply dropout with retention probability p after each recurrent layer.")
+parser.add_argument("-g", "--gpu", action="store_true", help="If set, optimize for training on gpu.")
 args = parser.parse_args()
 
 output_file = args.output_file
@@ -28,6 +29,7 @@ hidden_size = args.hidden_size
 optimizer = args.optimizer
 learning_rate = args.learning_rate
 dropout = args.dropout
+optimized_for = "gpu" if args.gpu else "cpu"
 
 # check arguments
 if hidden_num < 1:
@@ -60,9 +62,9 @@ else:
     if layer_type == "rnn":
         model.add(SimpleRNN(output_dim=hidden_size, return_sequences=True, input_shape=(None, vocab_size)))
     elif layer_type == "lstm":
-        model.add(LSTM(output_dim=hidden_size, return_sequences=True, input_shape=(None, vocab_size)))
+        model.add(LSTM(output_dim=hidden_size, return_sequences=True, input_shape=(None, vocab_size), consume_less=optimized_for))
     elif layer_type == "gru":
-        model.add(GRU(output_dim=hidden_size, return_sequences=True, input_shape=(None, vocab_size)))
+        model.add(GRU(output_dim=hidden_size, return_sequences=True, input_shape=(None, vocab_size), consume_less=optimized_for))
     # maybe add dropout
     if (dropout > 0.0):
         model.add(Dropout(dropout))
@@ -72,9 +74,9 @@ for i in range(layer_start, hidden_num):
     if layer_type == "rnn":
         model.add(SimpleRNN(output_dim=hidden_size, return_sequences=True))
     elif layer_type == "lstm":
-        model.add(LSTM(output_dim=hidden_size, return_sequences=True))
+        model.add(LSTM(output_dim=hidden_size, return_sequences=True, consume_less=optimized_for))
     elif layer_type == "gru":
-        model.add(GRU(output_dim=hidden_size, return_sequences=True))
+        model.add(GRU(output_dim=hidden_size, return_sequences=True, consume_less=optimized_for))
     # maybe add dropout
     if (dropout > 0.0):
         model.add(Dropout(dropout))

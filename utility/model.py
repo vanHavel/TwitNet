@@ -36,7 +36,7 @@ def generate_tweet(model, start, end_index, vocab_size, unknown_index=0, max_len
             nextword = sample(model, seq, temperature, vocab_size)
         else:
             while (nextword == unknown_index):
-                nextword = sample(model, seq, temperature)
+                nextword = sample(model, seq, temperature, vocab_size)
         seq.append(nextword)
     if seq[-1] != end_index:
         seq.append(end_index)

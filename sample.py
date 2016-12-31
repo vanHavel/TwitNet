@@ -47,7 +47,7 @@ if max_length < 1:
 print ("Reading vocab.")
 vfile = open(vocab_file, "r")
 index_to_word = [line[:-1] for line in vfile.readlines()]
-vocabsize = len(index_to_word)
+vocab_size = len(index_to_word)
 word_to_index = dict([(w,i) for i,w in enumerate(index_to_word)])
 vfile.close()
 
