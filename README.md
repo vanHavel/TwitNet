@@ -12,17 +12,17 @@ There are two files with model parameters in the pretrained directory:
 
 1. trump_word.mod is a word based language model with a vocabulary of 3000 words. The network is a 3 layer LSTM with 256 neurons each. To sample from this model, run
 
-```python
-python3 preprocess.py -v 3000
-python3 sample.py -m pretrained/trump_word.mod
-```
+  ```python
+  python3 preprocess.py -v 3000
+  python3 sample.py -m pretrained/trump_word.mod
+  ```
 
 2. trump_char.mod is a character based language model (3 layer LSTM with 512 units each). To sample from this model, run
 
-```python
-python3 preprocess_char.py 
-python3 sample_char.py -m pretrained/trump_char.mod
-```
+  ```python
+  python3 preprocess_char.py 
+  python3 sample_char.py -m pretrained/trump_char.mod
+  ```
 
 Here are some of my favourite outputs from the char based model (the part in brackets is what was fed to the network as beginning of the tweet):
 
