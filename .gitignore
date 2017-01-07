@@ -3,3 +3,5 @@ utility/__pycache__/*
 .DS_Store
 data/*
 model/*
+!data/.gitkeep
+!model/.gitkeep
